@@ -15,7 +15,7 @@ public class NameToTitle : MonoBehaviour {
 			title.color = Color.yellow;
 			break;
 
-		case "Blinky":
+		case "Blanko":
 			title.color = Color.red;
 			break;
 
@@ -37,7 +37,7 @@ public class NameToTitle : MonoBehaviour {
 
 	void OnMouseExit()
 	{
-		title.text = "Pac-Man Clone";
+		title.text = "Dose Runner";
 		title.color = Color.white;
 	}
 }
