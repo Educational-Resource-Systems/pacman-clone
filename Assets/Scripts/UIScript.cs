@@ -2,41 +2,63 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIScript : MonoBehaviour {
-
+public class UIScript : MonoBehaviour
+{
 	public int high, score;
 
 	public List<Image> lives = new List<Image>(3);
 
 	Text txt_score, txt_high, txt_level;
-	
+	private ScoreManager scoreManager; // Cache ScoreManager reference
+
 	// Use this for initialization
-	void Start () 
+	void Start()
 	{
-		txt_score = GetComponentsInChildren<Text>()[1];
-		txt_high = GetComponentsInChildren<Text>()[0];
-        txt_level = GetComponentsInChildren<Text>()[2];
+		Text[] texts = GetComponentsInChildren<Text>();
+		if (texts.Length >= 3)
+		{
+			txt_score = texts[1];
+			txt_high = texts[0];
+			txt_level = texts[2];
+		}
+		else
+		{
+			Debug.LogError("Not enough Text components found!");
+		}
 
-	    for (int i = 0; i < 3 - GameManager.lives; i++)
-	    {
-	        Destroy(lives[lives.Count-1]);
-            lives.RemoveAt(lives.Count-1);
-	    }
+		scoreManager = GameObject.Find("Game Manager").GetComponent<ScoreManager>();
+		if (scoreManager == null)
+		{
+			Debug.LogError("ScoreManager not found on Game Manager!");
+		}
+
+		for (int i = 0; i < 3 - GameManager.lives; i++)
+		{
+			if (lives.Count > 0)
+			{
+				Destroy(lives[lives.Count - 1].gameObject); // Destroy GameObject
+				lives.RemoveAt(lives.Count - 1);
+			}
+		}
 	}
-	
+
 	// Update is called once per frame
-	void Update () 
+	void Update()
 	{
+		if (scoreManager != null)
+		{
+			high = scoreManager.High();
+		}
+		else
+		{
+			high = 0;
+			Debug.LogWarning("ScoreManager is null, using high score 0");
+		}
 
-        high = GameObject.Find("Game Manager").GetComponent<ScoreManager>().High();
-
-        // update score text
-        score = GameManager.score;
+		// Update score text
+		score = GameManager.score;
 		txt_score.text = "Score\n" + score;
 		txt_high.text = "High Score\n" + high;
-	    txt_level.text = "Level\n" + (GameManager.Level + 1);
-
+		txt_level.text = "Level\n" + (GameManager.Level + 1);
 	}
-
-
 }

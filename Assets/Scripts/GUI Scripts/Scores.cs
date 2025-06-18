@@ -7,8 +7,8 @@ public class Scores : MonoBehaviour
     public ScoreManager scoreManager;
 
     Text scores_txt;
-
-    public void UpdateGUIText(List<ScoreManager.Score> scoreList)
+	/*
+	public void UpdateGUIText(List<ScoreManager.ScoreEntry> scoreList)
     {
         scores_txt = GetComponent<Text>();
         Debug.Log("Updating GUIText: scorelist count=" + scoreList.Count);
@@ -23,5 +23,5 @@ public class Scores : MonoBehaviour
 
         scores_txt.text = s;
     }
-
+*/
 }

@@ -1,154 +1,162 @@
-﻿using System;
+﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Networking; // For UnityWebRequest
+
+[System.Serializable]
+public class ScoreEntry
+{
+	public string name;
+	public string email;
+	public int score;
+}
 
 public class ScoreManager : MonoBehaviour
 {
-    private string TopScoresURL = "https://ers-dev.com/ERS/_pacman/topscores.php";
-    private string username;
-    private int _highscore;
-    private int _lowestHigh;
-    private bool _scoresRead;
-    private bool _isTableFound;
+	public static ScoreManager instance;
+	private string topscoresURL = "https://ers-dev.com//ERS/_pacman/build5/topscores.php"; // Update with your server URL
+	private int currentScore = 0;
+	private string playerName;
+	private string playerEmail;
+	private int lowestHighScore = 0; // Cache for lowest highscore
+	private int highestHighScore = 0; // Cache for highest highscore
 
-    public class Score
-    {
-        public string name { get; set; }
-        public int score { get; set; }
+	void Awake()
+	{
+		if (instance == null)
+		{
+			instance = this;
+			DontDestroyOnLoad(gameObject);
+		}
+		else
+		{
+			Destroy(gameObject);
+		}
+		playerName = PlayerPrefs.GetString("PlayerName", "Anonymous");
+		playerEmail = PlayerPrefs.GetString("PlayerEmail", "none");
+		// Initialize caches
+		StartCoroutine(FetchLowestHigh(delegate(int score) { lowestHighScore = score; }));
+		StartCoroutine(FetchHighestHigh(delegate(int score) { highestHighScore = score; }));
+	}
 
-        public Score(string n, int s)
-        {
-            name = n;
-            score = s;
-        }
+	public void SaveScore(int score)
+	{
+		currentScore = score;
+		StartCoroutine(SubmitScore());
+	}
 
-        public Score(string n, string s)
-        {
-            name = n;
-            score = Int32.Parse(s);
-        }
-    }
+	IEnumerator SubmitScore()
+	{
+		WWWForm form = new WWWForm();
+		form.AddField("player_name", playerName);
+		form.AddField("email", playerEmail);
+		form.AddField("score", currentScore);
 
-    List<Score> scoreList = new List<Score>(10);
+		UnityWebRequest www = UnityWebRequest.Post(topscoresURL, form);
+		yield return www.Send();
 
-    void OnLevelWasLoaded(int level)
-    {
-        if (level == 2) StartCoroutine(ReadScoresFromDB()); // Start reading scores when scores scene is loaded
-        if (level == 1) _lowestHigh = _highscore = 99999;
-    }
+		if (www.isError)
+		{
+			Debug.LogError("Score submission failed: " + www.error);
+		}
+		else
+		{
+			Debug.Log("Score submitted successfully");
+			// Update caches
+			StartCoroutine(FetchLowestHigh(delegate(int score) { lowestHighScore = score; }));
+			StartCoroutine(FetchHighestHigh(delegate(int score) { highestHighScore = score; }));
+		}
+	}
 
-    IEnumerator GetHighestScore()
-    {
-        Debug.Log("GETTING HIGHEST SCORE");
-        float timeOut = Time.time + 4;
-        while (!_scoresRead)
-        {
-            yield return new WaitForSeconds(0.01f);
-            if (Time.time > timeOut)
-            {
-                Debug.Log("Timed out fetching highest score");
-                break;
-            }
-        }
+	public void GetHighscores(System.Action<List<ScoreEntry>> callback)
+	{
+		StartCoroutine(FetchHighscores(callback));
+	}
 
-        if (scoreList.Count > 0)
-        {
-            _highscore = scoreList[0].score;
-            _lowestHigh = scoreList[scoreList.Count - 1].score;
-        }
-    }
+	IEnumerator FetchHighscores(System.Action<List<ScoreEntry>> callback)
+	{
+		UnityWebRequest www = UnityWebRequest.Get(topscoresURL);
+		yield return www.Send();
 
-    IEnumerator UpdateGUIText()
-    {
-        float timeOut = Time.time + 4;
-        while (!_scoresRead)
-        {
-            yield return new WaitForSeconds(0.01f);
-            if (Time.time > timeOut)
-            {
-                Debug.Log("Timeout fetching scores");
-                scoreList.Clear();
-                scoreList.Add(new Score("DATABASE TEMPORARILY UNAVAILABLE", 999999));
-                break;
-            }
-        }
+		if (www.isError)
+		{
+			Debug.LogError("Failed to fetch highscores: " + www.error);
+			callback(null);
+		}
+		else
+		{
+			string json = www.downloadHandler.text;
+			ScoreEntry[] scores = JsonUtility.FromJson<ScoreEntry[]>(json);
+			callback(new List<ScoreEntry>(scores));
+		}
+	}
 
-        GameObject scoresText = GameObject.FindGameObjectWithTag("ScoresText");
-        if (scoresText != null)
-        {
-            scoresText.GetComponent<Scores>().UpdateGUIText(scoreList);
-        }
-        else
-        {
-            Debug.LogError("ScoresText GameObject not found!");
-        }
-    }
+	public int LowestHigh()
+	{
+		return lowestHighScore;
+	}
 
-   IEnumerator ReadScoresFromDB()
-{
-    _scoresRead = false;
-    using (UnityWebRequest www = UnityWebRequest.Get(TopScoresURL))
-    {
-        yield return www.Send();
+	public int High() // New method for highest score
+	{
+		return highestHighScore;
+	}
 
-        if (www.isError)
-        {
-            scoreList.Add(new Score(www.error, 1234));
-            StartCoroutine(UpdateGUIText());
-        }
-        else
-        {
-            string responseText = www.downloadHandler.text;
+	IEnumerator FetchLowestHigh(System.Action<int> callback)
+	{
+		UnityWebRequest www = UnityWebRequest.Get(topscoresURL);
+		yield return www.Send();
 
-            string[] textlist = responseText.Split(new string[] { "\n", "\t" }, StringSplitOptions.RemoveEmptyEntries);
+		if (www.isError)
+		{
+			Debug.LogError("Failed to fetch highscores: " + www.error);
+			callback(0);
+		}
+		else
+		{
+			string json = www.downloadHandler.text;
+			ScoreEntry[] scores = JsonUtility.FromJson<ScoreEntry[]>(json);
+			if (scores == null || scores.Length == 0)
+			{
+				callback(0);
+			}
+			else
+			{
+				int lowestScore = scores[0].score;
+				for (int i = 1; i < scores.Length && i < 20; i++)
+				{
+					if (scores[i].score < lowestScore)
+					{
+						lowestScore = scores[i].score;
+					}
+				}
+				callback(lowestScore);
+			}
+		}
+	}
 
-            if (textlist.Length == 1)
-            {
-                scoreList.Clear();
-                scoreList.Add(new Score(textlist[0], -123));
-            }
-            else
-            {
-                string[] Names = new string[Mathf.FloorToInt(textlist.Length / 2)];
-                string[] Scores = new string[Names.Length];
+	IEnumerator FetchHighestHigh(System.Action<int> callback)
+	{
+		UnityWebRequest www = UnityWebRequest.Get(topscoresURL);
+		yield return www.Send();
 
-                for (int i = 0; i < textlist.Length; i++)
-                {
-                    if (i % 2 == 0)
-                        Names[Mathf.FloorToInt(i / 2)] = textlist[i];
-                    else
-                        Scores[Mathf.FloorToInt(i / 2)] = textlist[i];
-                }
-
-                scoreList.Clear();
-                for (int i = 0; i < Names.Length; i++)
-                {
-                    try
-                    {
-                        scoreList.Add(new Score(Names[i], Scores[i]));
-                    }
-                    catch (Exception e)
-                    {
-                        // Handle error
-                    }
-                }
-
-                _scoresRead = true;
-            }
-            StartCoroutine(UpdateGUIText());
-        }
-    }
-}
-
-    public int High()
-    {
-        return _highscore;
-    }
-
-    public int LowestHigh()
-    {
-        return _lowestHigh;
-    }
+		if (www.isError)
+		{
+			Debug.LogError("Failed to fetch highscores: " + www.error);
+			callback(0);
+		}
+		else
+		{
+			string json = www.downloadHandler.text;
+			ScoreEntry[] scores = JsonUtility.FromJson<ScoreEntry[]>(json);
+			if (scores == null || scores.Length == 0)
+			{
+				callback(0);
+			}
+			else
+			{
+				int highestScore = scores[0].score; // Top score is first (sorted DESC)
+				callback(highestScore);
+			}
+		}
+	}
 }

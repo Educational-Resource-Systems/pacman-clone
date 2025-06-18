@@ -19,16 +19,16 @@ public class NameToTitle : MonoBehaviour {
 			title.color = Color.red;
 			break;
 
-		case "Pinky":
-			title.color = new Color(254f/255f, 152f/255f, 203f/255f);
+		case "Fizzle":
+			title.color = new Color(200f/255f, 214f/255f, 235f/255f);
 			break;
 
-		case "Inky":
-			title.color = Color.cyan;
+		case "Misalingo":
+			title.color = new Color(153f/255f, 186f/255f, 169f/255f);
 			break;
 
-		case "Clyde":
-			title.color = new Color(254f/255f, 203f/255f, 51f/255f);
+		case "Clutterbug":
+			title.color = new Color(221f/255f, 182f/255f, 139f/255f);
 			break;
 		}
 		

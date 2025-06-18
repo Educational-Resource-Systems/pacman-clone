@@ -7,6 +7,8 @@ public class MenuUIManager : MonoBehaviour
 
 	void Start()
 	{
+
+		//PlayerPrefs.DeleteKey("PlayerName"); // Add to MenuUIManager.cs Start() if desired
 		// Retrieve the player name from PlayerPrefs
 		string playerName = PlayerPrefs.GetString("PlayerName", "Anonymous");
 		Debug.Log("Player Name: " + playerName);
