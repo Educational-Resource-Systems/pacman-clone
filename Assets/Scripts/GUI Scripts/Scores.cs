@@ -1,27 +1,57 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class Scores : MonoBehaviour
 {
-    public ScoreManager scoreManager;
+	public Text highscoreText; // Assign in Inspector
 
-    Text scores_txt;
-	/*
-	public void UpdateGUIText(List<ScoreManager.ScoreEntry> scoreList)
-    {
-        scores_txt = GetComponent<Text>();
-        Debug.Log("Updating GUIText: scorelist count=" + scoreList.Count);
-        string s = "";
-        foreach (ScoreManager.Score sc in scoreList)
-        {
-            if (sc.score < 1000)
-                s += sc.score + "\t\t\t" + sc.name + "\n";
-            else
-                s += sc.score + "\t\t" + sc.name + "\n";
-        }
+	void Start()
+	{
+		if (ScoreManager.instance != null)
+		{
+			ScoreManager.instance.GetHighscores(DisplayScores);
+		}
+		else
+		{
+			Debug.LogError("ScoreManager instance is null!");
+			if (highscoreText != null)
+			{
+				highscoreText.text = "Error: ScoreManager not found";
+			}
+		}
+	}
 
-        scores_txt.text = s;
-    }
-*/
+	void DisplayScores(List<ScoreEntry> scores)
+	{
+		try
+		{
+			if (highscoreText == null)
+			{
+				Debug.LogError("highscoreText is not assigned!");
+				return;
+			}
+
+			if (scores == null || scores.Count == 0)
+			{
+				highscoreText.text = "No scores available";
+				return;
+			}
+
+			string displayText = "Highscores:\n";
+			for (int i = 0; i < scores.Count && i < 20; i++)
+			{
+				displayText = displayText + (i + 1) + ". " + scores[i].name + ": " + scores[i].score + "\n";
+			}
+			highscoreText.text = displayText;
+		}
+		catch (System.Exception e)
+		{
+			Debug.LogError("Exception in DisplayScores: " + e.Message);
+			if (highscoreText != null)
+			{
+				highscoreText.text = "Error displaying scores";
+			}
+		}
+	}
 }

@@ -66,25 +66,27 @@ public class PlayerController : MonoBehaviour
 
 		if (GameManager.lives <= 0)
 		{
+			Debug.Log("Game over, lives: " + GameManager.lives + ", score: " + GameManager.score);
 			if (SM != null)
 			{
 				int lowestHigh = SM.LowestHigh();
 				Debug.Log("Threshold for Highscore: " + lowestHigh + ", Current Score: " + GameManager.score);
 				if (GameManager.score >= lowestHigh)
 				{
-					Debug.Log("Score qualifies for highscore, showing scores menu");
-					SM.SaveScore(GameManager.score); // Save score before showing menu
+					Debug.Log("Saving highscore and loading scores menu");
+					SM.SaveScore(GameManager.score);
+					yield return new WaitForSeconds(0.5f); // Wait for SaveScore to complete
 					GUINav.getScoresMenu();
 				}
 				else
 				{
-					Debug.Log("Score too low, showing game over screen");
+					Debug.Log("Loading game over screen");
 					GUINav.H_ShowGameOverScreen();
 				}
 			}
 			else
 			{
-				Debug.LogError("ScoreManager is null, showing game over screen");
+				Debug.LogError("ScoreManager is null, loading game over screen");
 				GUINav.H_ShowGameOverScreen();
 			}
 		}
