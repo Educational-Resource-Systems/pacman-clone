@@ -1,17 +1,17 @@
 fileFormatVersion: 2
-guid: 521214ed537ff6c4686cfc26124a42d0
-timeCreated: 1750320687
+guid: 1fed3a1f5d8e6784bbfb349ee6ffd33e
+timeCreated: 1750432736
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Teal Ghost MISALINGOpng_0
-    21300002: Teal Ghost MISALINGOpng_1
-    21300004: Teal Ghost MISALINGOpng_2
-    21300006: Teal Ghost MISALINGOpng_3
-    21300008: Teal Ghost MISALINGOpng_4
-    21300010: Teal Ghost MISALINGOpng_5
-    21300012: Teal Ghost MISALINGOpng_6
-    21300014: Teal Ghost MISALINGOpng_7
+    21300000: 1_0
+    21300002: 1_1
+    21300004: 1_2
+    21300006: 1_3
+    21300008: 1_4
+    21300010: 1_5
+    21300012: 1_6
+    21300014: 1_7
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -102,7 +102,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Teal Ghost MISALINGOpng_0
+      name: 1_0
       rect:
         serializedVersion: 2
         x: 0
@@ -115,7 +115,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Teal Ghost MISALINGOpng_1
+      name: 1_1
       rect:
         serializedVersion: 2
         x: 16
@@ -128,7 +128,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Teal Ghost MISALINGOpng_2
+      name: 1_2
       rect:
         serializedVersion: 2
         x: 0
@@ -141,7 +141,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Teal Ghost MISALINGOpng_3
+      name: 1_3
       rect:
         serializedVersion: 2
         x: 16
@@ -154,7 +154,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Teal Ghost MISALINGOpng_4
+      name: 1_4
       rect:
         serializedVersion: 2
         x: 0
@@ -167,7 +167,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Teal Ghost MISALINGOpng_5
+      name: 1_5
       rect:
         serializedVersion: 2
         x: 16
@@ -180,7 +180,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Teal Ghost MISALINGOpng_6
+      name: 1_6
       rect:
         serializedVersion: 2
         x: 0
@@ -193,7 +193,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Teal Ghost MISALINGOpng_7
+      name: 1_7
       rect:
         serializedVersion: 2
         x: 16

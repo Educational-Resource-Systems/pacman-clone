@@ -7,19 +7,22 @@ using System.Collections.Generic;
 public class ScoreEntry
 {
 	public string name;
-	public string email; // Included for compatibility, not used in display
+	public string email;
 	public int score;
 }
 
 public class ScoreManager : MonoBehaviour
 {
 	public static ScoreManager instance;
-	private string topscoresURL = "https://ers-dev.com//ERS/_pacman/build5/topscores.php"; // Update with HTTPS URL
+	private string topscoresURL = "https://ers-dev.com/ERS/_pacman/build5/topscores.php";
 	private int currentScore = 0;
 	private string playerName;
 	private string playerEmail;
 	private int lowestHighScore = 0;
 	private int highestHighScore = 0;
+	private List<ScoreEntry> cachedScores = new List<ScoreEntry>(); // Cache full list
+	private bool isSavingScore = false;
+	private bool needsPlayerPrefsSave = false;
 
 	void Awake()
 	{
@@ -34,23 +37,47 @@ public class ScoreManager : MonoBehaviour
 		}
 		playerName = PlayerPrefs.GetString("PlayerName", "Anonymous");
 		playerEmail = PlayerPrefs.GetString("PlayerEmail", "none");
-		StartCoroutine(FetchLowestHigh(delegate(int score) { lowestHighScore = score; }));
-		StartCoroutine(FetchHighestHigh(delegate(int score) { highestHighScore = score; }));
+		// Load cached scores
+		string cachedCsv = PlayerPrefs.GetString("CachedScores", "");
+		if (!string.IsNullOrEmpty(cachedCsv))
+		{
+			Debug.Log("Loading cached scores");
+			cachedScores = ParseCSV(cachedCsv);
+			UpdateHighLowScores();
+		}
+		StartCoroutine(FetchScores()); // Single fetch
+	}
+
+	void Update()
+	{
+		if (needsPlayerPrefsSave)
+		{
+			Debug.Log("Saving PlayerPrefs");
+			PlayerPrefs.Save();
+			needsPlayerPrefsSave = false;
+		}
 	}
 
 	public void SaveScore(int score)
 	{
+		if (isSavingScore)
+		{
+			Debug.LogWarning("Score save in progress, skipping");
+			return;
+		}
 		currentScore = score;
 		StartCoroutine(SubmitScore());
 	}
 
 	IEnumerator SubmitScore()
 	{
+		isSavingScore = true;
 		WWWForm form = new WWWForm();
 		form.AddField("player_name", playerName);
 		form.AddField("email", playerEmail);
 		form.AddField("score", currentScore);
 
+		Debug.Log("Submitting score: " + currentScore);
 		UnityWebRequest www = UnityWebRequest.Post(topscoresURL, form);
 		yield return www.Send();
 
@@ -67,8 +94,9 @@ public class ScoreManager : MonoBehaviour
 				if (response.Contains("successfully"))
 				{
 					Debug.Log("Score submitted successfully");
-					StartCoroutine(FetchLowestHigh(delegate(int score) { lowestHighScore = score; }));
-					StartCoroutine(FetchHighestHigh(delegate(int score) { highestHighScore = score; }));
+					PlayerPrefs.SetInt("LastScore", currentScore);
+					needsPlayerPrefsSave = true;
+					StartCoroutine(FetchScores()); // Refresh scores
 				}
 				else
 				{
@@ -80,11 +108,20 @@ public class ScoreManager : MonoBehaviour
 				Debug.LogError("Exception in SubmitScore: " + e.Message);
 			}
 		}
+		isSavingScore = false;
 	}
 
 	public void GetHighscores(System.Action<List<ScoreEntry>> callback)
 	{
-		StartCoroutine(FetchHighscores(callback));
+		if (cachedScores.Count > 0)
+		{
+			Debug.Log("Using cached highscores");
+			callback(cachedScores);
+		}
+		else
+		{
+			StartCoroutine(FetchHighscores(callback));
+		}
 	}
 
 	IEnumerator FetchHighscores(System.Action<List<ScoreEntry>> callback)
@@ -95,7 +132,7 @@ public class ScoreManager : MonoBehaviour
 		if (www.isError)
 		{
 			Debug.LogError("Failed to fetch highscores: " + www.error);
-			callback(null);
+			callback(cachedScores.Count > 0 ? cachedScores : null);
 		}
 		else
 		{
@@ -103,13 +140,19 @@ public class ScoreManager : MonoBehaviour
 			{
 				string response = www.downloadHandler.text;
 				Debug.Log("Raw response: " + response);
-				List<ScoreEntry> scores = ParseCSV(response);
-				callback(scores);
+				cachedScores = ParseCSV(response);
+				if (cachedScores != null)
+				{
+					PlayerPrefs.SetString("CachedScores", response);
+					needsPlayerPrefsSave = true;
+					UpdateHighLowScores();
+				}
+				callback(cachedScores);
 			}
 			catch (System.Exception e)
 			{
 				Debug.LogError("Exception parsing highscores: " + e.Message);
-				callback(null);
+				callback(cachedScores.Count > 0 ? cachedScores : null);
 			}
 		}
 	}
@@ -124,80 +167,54 @@ public class ScoreManager : MonoBehaviour
 		return highestHighScore;
 	}
 
-	IEnumerator FetchLowestHigh(System.Action<int> callback)
+	IEnumerator FetchScores()
 	{
 		UnityWebRequest www = UnityWebRequest.Get(topscoresURL);
 		yield return www.Send();
 
 		if (www.isError)
 		{
-			Debug.LogError("Failed to fetch highscores: " + www.error);
-			callback(0);
+			Debug.LogError("Failed to fetch scores: " + www.error);
 		}
 		else
 		{
 			try
 			{
 				string response = www.downloadHandler.text;
-				Debug.Log("Raw response (LowestHigh): " + response);
-				List<ScoreEntry> scores = ParseCSV(response);
-				if (scores == null || scores.Count == 0)
+				Debug.Log("Raw response (FetchScores): " + response);
+				cachedScores = ParseCSV(response);
+				if (cachedScores != null)
 				{
-					callback(0);
-				}
-				else
-				{
-					int lowestScore = scores[0].score;
-					for (int i = 1; i < scores.Count && i < 20; i++)
-					{
-						if (scores[i].score < lowestScore)
-						{
-							lowestScore = scores[i].score;
-						}
-					}
-					callback(lowestScore);
+					PlayerPrefs.SetString("CachedScores", response);
+					needsPlayerPrefsSave = true;
+					UpdateHighLowScores();
 				}
 			}
 			catch (System.Exception e)
 			{
-				Debug.LogError("Exception in FetchLowestHigh: " + e.Message);
-				callback(0);
+				Debug.LogError("Exception in FetchScores: " + e.Message);
 			}
 		}
 	}
 
-	IEnumerator FetchHighestHigh(System.Action<int> callback)
+	private void UpdateHighLowScores()
 	{
-		UnityWebRequest www = UnityWebRequest.Get(topscoresURL);
-		yield return www.Send();
-
-		if (www.isError)
+		if (cachedScores == null || cachedScores.Count == 0)
 		{
-			Debug.LogError("Failed to fetch highscores: " + www.error);
-			callback(0);
+			lowestHighScore = 0;
+			highestHighScore = 0;
+			return;
 		}
-		else
+		highestHighScore = cachedScores[0].score; // First is highest (sorted DESC)
+		lowestHighScore = cachedScores[0].score;
+		for (int i = 1; i < cachedScores.Count && i < 20; i++)
 		{
-			try
+			if (cachedScores[i].score < lowestHighScore)
 			{
-				string response = www.downloadHandler.text;
-				Debug.Log("Raw response (HighestHigh): " + response);
-				List<ScoreEntry> scores = ParseCSV(response);
-				if (scores == null || scores.Count == 0)
-				{
-					callback(0);
-				}
-				else
-				{
-					callback(scores[0].score);
-				}
-			}
-			catch (System.Exception e)
-			{
-				Debug.LogError("Exception in FetchHighestHigh: " + e.Message);
-				callback(0);
+				lowestHighScore = cachedScores[i].score;
 			}
 		}
+		Debug.Log("Updated high/low scores: High=" + highestHighScore + ", Low=" + lowestHighScore);
 	}
 
 	private List<ScoreEntry> ParseCSV(string csv)
@@ -210,20 +227,17 @@ public class ScoreManager : MonoBehaviour
 
 		List<ScoreEntry> scores = new List<ScoreEntry>();
 		string[] lines = csv.Split('\n');
-		if (lines.Length < 2) // Expect at least header + 1 data row
+		if (lines.Length < 2)
 		{
 			Debug.LogWarning("Invalid CSV: Too few lines");
 			return null;
 		}
 
-		// Skip header (name,score)
 		for (int i = 1; i < lines.Length; i++)
 		{
 			string line = lines[i].Trim();
-			if (string.IsNullOrEmpty(line))
-				continue;
+			if (string.IsNullOrEmpty(line)) continue;
 
-			// Handle escaped commas in names
 			string[] parts = SplitCSVLine(line);
 			if (parts.Length != 2)
 			{
@@ -234,9 +248,9 @@ public class ScoreManager : MonoBehaviour
 			try
 			{
 				ScoreEntry entry = new ScoreEntry();
-				entry.name = parts[0].Replace("\\,", ","); // Unescape commas
+				entry.name = parts[0].Replace("\\,", ",");
 				entry.score = int.Parse(parts[1]);
-				entry.email = ""; // Not used in GET response
+				entry.email = "";
 				scores.Add(entry);
 			}
 			catch (System.Exception e)

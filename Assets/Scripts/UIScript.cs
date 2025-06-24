@@ -45,20 +45,25 @@ public class UIScript : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (scoreManager != null)
+		try
 		{
-			high = scoreManager.High();
+			if (scoreManager != null)
+			{
+				high = scoreManager.High();
+			}
+			else
+			{
+				high = 0;
+				Debug.LogWarning("ScoreManager is null, using high score 0");
+			}
+			score = GameManager.score;
+			if (txt_score != null) txt_score.text = "Score\n" + score;
+			if (txt_high != null) txt_high.text = "High Score\n" + high;
+			if (txt_level != null) txt_level.text = "Level\n" + (GameManager.Level + 1);
 		}
-		else
+		catch (System.Exception e)
 		{
-			high = 0;
-			Debug.LogWarning("ScoreManager is null, using high score 0");
+			Debug.LogError("Exception in UIScript Update: " + e.Message);
 		}
-
-		// Update score text
-		score = GameManager.score;
-		txt_score.text = "Score\n" + score;
-		txt_high.text = "High Score\n" + high;
-		txt_level.text = "Level\n" + (GameManager.Level + 1);
 	}
 }

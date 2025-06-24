@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement; // Add this
 
 public class GameManager : MonoBehaviour {
 
@@ -101,6 +102,7 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+
 	public void ResetScene()
 	{
         CalmGhosts();
@@ -121,6 +123,16 @@ public class GameManager : MonoBehaviour {
         gui.H_ShowReadyScreen();
 
 	}
+
+/*
+
+	public void ResetScene()
+	{
+		Debug.Log("Resetting scene");
+		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+	}
+
+*/
 
 	public void ToggleScare()
 	{
@@ -168,6 +180,7 @@ public class GameManager : MonoBehaviour {
 
     }
 
+	/*
     public void LoseLife()
     {
         lives--;
@@ -178,6 +191,20 @@ public class GameManager : MonoBehaviour {
         Destroy(ui.lives[ui.lives.Count - 1]);
         ui.lives.RemoveAt(ui.lives.Count - 1);
     }
+
+*/
+	public void LoseLife()
+	{
+		Debug.Log("Losing life, lives: " + lives);
+		lives--;
+		gameState = GameState.Dead;
+
+		// update UI too
+		UIScript ui = GameObject.FindObjectOfType<UIScript>();
+		Destroy(ui.lives[ui.lives.Count - 1]);
+		ui.lives.RemoveAt(ui.lives.Count - 1);
+
+	}
 
     public static void DestroySelf()
     {

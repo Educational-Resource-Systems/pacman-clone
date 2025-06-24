@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Text.RegularExpressions;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; // Add this
 
 public class GameGUINavigation : MonoBehaviour {
 
@@ -62,11 +63,21 @@ public class GameGUINavigation : MonoBehaviour {
 		StartCoroutine("ShowReadyScreen", initialDelay);
 	}
 
+
     public void H_ShowGameOverScreen()
     {
         StartCoroutine("ShowGameOverScreen");
     }
+    
 
+	/*
+	public void H_ShowGameOverScreen()
+	{
+		Debug.Log("Loading GameOver scene");
+		SceneManager.LoadScene("GameOver");
+	}
+
+	*/
 	IEnumerator ShowReadyScreen(float seconds)
 	{
 		//initialWaitOver = false;
@@ -86,12 +97,20 @@ public class GameGUINavigation : MonoBehaviour {
         Menu();
     }
 
+	/*
 	public void getScoresMenu()
 	{
-		Time.timeScale = 0f;		// stop the animations
+		Time.timeScale = 0f;		
 		GameManager.gameState = GameManager.GameState.Scores;
 		MenuButton.enabled = false;
 		ScoreCanvas.enabled = true;
+	}
+
+*/
+	public void getScoresMenu()
+	{
+		Debug.Log("Loading HighScores scene");
+		SceneManager.LoadScene("scores");
 	}
 
 	//------------------------------------------------------------------

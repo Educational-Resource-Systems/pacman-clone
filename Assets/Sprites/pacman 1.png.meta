@@ -1,17 +1,21 @@
 fileFormatVersion: 2
-guid: f3d5916a15a175e40a221289ec46cfc3
-timeCreated: 1750320420
+guid: d441347882e1b0040bbf01486044eaa9
+timeCreated: 1750435904
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Coral Ghost CLUTTERBUG_0
-    21300002: Coral Ghost CLUTTERBUG_1
-    21300004: Coral Ghost CLUTTERBUG_2
-    21300006: Coral Ghost CLUTTERBUG_3
-    21300008: Coral Ghost CLUTTERBUG_4
-    21300010: Coral Ghost CLUTTERBUG_5
-    21300012: Coral Ghost CLUTTERBUG_6
-    21300014: Coral Ghost CLUTTERBUG_7
+    21300000: pacman 1_0
+    21300002: pacman 1_1
+    21300004: pacman 1_2
+    21300006: pacman 1_3
+    21300008: pacman 1_4
+    21300010: pacman 1_5
+    21300012: pacman 1_6
+    21300014: pacman 1_7
+    21300016: pacman 1_8
+    21300018: pacman 1_9
+    21300020: pacman 1_10
+    21300022: pacman 1_11
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -102,7 +106,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Coral Ghost CLUTTERBUG_0
+      name: pacman 1_0
       rect:
         serializedVersion: 2
         x: 0
@@ -115,7 +119,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Coral Ghost CLUTTERBUG_1
+      name: pacman 1_1
       rect:
         serializedVersion: 2
         x: 16
@@ -128,7 +132,20 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Coral Ghost CLUTTERBUG_2
+      name: pacman 1_2
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 48
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: pacman 1_3
       rect:
         serializedVersion: 2
         x: 0
@@ -141,7 +158,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Coral Ghost CLUTTERBUG_3
+      name: pacman 1_4
       rect:
         serializedVersion: 2
         x: 16
@@ -154,7 +171,20 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Coral Ghost CLUTTERBUG_4
+      name: pacman 1_5
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 32
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: pacman 1_6
       rect:
         serializedVersion: 2
         x: 0
@@ -167,7 +197,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Coral Ghost CLUTTERBUG_5
+      name: pacman 1_7
       rect:
         serializedVersion: 2
         x: 16
@@ -180,7 +210,20 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Coral Ghost CLUTTERBUG_6
+      name: pacman 1_8
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: pacman 1_9
       rect:
         serializedVersion: 2
         x: 0
@@ -193,10 +236,23 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Coral Ghost CLUTTERBUG_7
+      name: pacman 1_10
       rect:
         serializedVersion: 2
         x: 16
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: pacman 1_11
+      rect:
+        serializedVersion: 2
+        x: 32
         y: 0
         width: 16
         height: 16

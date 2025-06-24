@@ -32,10 +32,7 @@ public class PlayerController : MonoBehaviour
 		GM = GameObject.Find("Game Manager").GetComponent<GameManager>();
 		SM = GameObject.Find("Game Manager").GetComponent<ScoreManager>();
 		GUINav = GameObject.Find("UI Manager").GetComponent<GameGUINavigation>();
-		if (SM == null)
-		{
-			Debug.LogError("ScoreManager not found on Game Manager!");
-		}
+		if (SM == null) Debug.LogError("ScoreManager not found!");
 		_dest = transform.position;
 	}
 
@@ -58,12 +55,19 @@ public class PlayerController : MonoBehaviour
 
 	IEnumerator PlayDeadAnimation()
 	{
+		// Play death animation
 		_deadPlaying = true;
 		GetComponent<Animator>().SetBool("Die", true);
 		yield return new WaitForSeconds(1);
 		GetComponent<Animator>().SetBool("Die", false);
 		_deadPlaying = false;
 
+		// Handle game logic
+		yield return StartCoroutine(HandleGameOver());
+	}
+
+	private IEnumerator HandleGameOver()
+	{
 		if (GameManager.lives <= 0)
 		{
 			Debug.Log("Game over, lives: " + GameManager.lives + ", score: " + GameManager.score);
@@ -73,28 +77,61 @@ public class PlayerController : MonoBehaviour
 				Debug.Log("Threshold for Highscore: " + lowestHigh + ", Current Score: " + GameManager.score);
 				if (GameManager.score >= lowestHigh)
 				{
-					Debug.Log("Saving highscore and loading scores menu");
-					SM.SaveScore(GameManager.score);
-					yield return new WaitForSeconds(0.5f); // Wait for SaveScore to complete
-					GUINav.getScoresMenu();
+					yield return StartCoroutine(SaveAndShowHighscore());
 				}
 				else
 				{
-					Debug.Log("Loading game over screen");
-					GUINav.H_ShowGameOverScreen();
+					yield return StartCoroutine(ShowGameOver());
 				}
 			}
 			else
 			{
 				Debug.LogError("ScoreManager is null, loading game over screen");
-				GUINav.H_ShowGameOverScreen();
+				yield return StartCoroutine(ShowGameOver());
 			}
 		}
 		else
 		{
-			Debug.Log("Resetting scene, lives remaining: " + GameManager.lives);
+			Debug.Log("Resetting scene, lives: " + GameManager.lives);
 			GM.ResetScene();
 		}
+	}
+
+	private IEnumerator SaveAndShowHighscore()
+	{
+		try
+		{
+			Debug.Log("Saving highscore");
+			SM.SaveScore(GameManager.score);
+		}
+		catch (System.Exception e)
+		{
+			Debug.LogError("SaveScore error: " + e.Message);
+		}
+		yield return new WaitForSeconds(1f);
+		try
+		{
+			Debug.Log("Loading scores menu");
+			GUINav.getScoresMenu();
+		}
+		catch (System.Exception e)
+		{
+			Debug.LogError("getScoresMenu error: " + e.Message);
+		}
+	}
+
+	private IEnumerator ShowGameOver()
+	{
+		try
+		{
+			Debug.Log("Loading game over screen");
+			GUINav.H_ShowGameOverScreen();
+		}
+		catch (System.Exception e)
+		{
+			Debug.LogError("H_ShowGameOverScreen error: " + e.Message);
+		}
+		yield return null;
 	}
 
 	void Animate()
