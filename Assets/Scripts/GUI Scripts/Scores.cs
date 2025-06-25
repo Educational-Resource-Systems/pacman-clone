@@ -39,7 +39,7 @@ public class Scores : MonoBehaviour
 			}
 
 			string displayText = "Highscores:\n";
-			for (int i = 0; i < scores.Count && i < 20; i++)
+			for (int i = 0; i < scores.Count && i < 10; i++)
 			{
 				displayText = displayText + (i + 1) + ". " + scores[i].name + ": " + scores[i].score + "\n";
 			}

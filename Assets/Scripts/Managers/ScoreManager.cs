@@ -207,7 +207,7 @@ public class ScoreManager : MonoBehaviour
 		}
 		highestHighScore = cachedScores[0].score; // First is highest (sorted DESC)
 		lowestHighScore = cachedScores[0].score;
-		for (int i = 1; i < cachedScores.Count && i < 20; i++)
+		for (int i = 1; i < cachedScores.Count && i < 10; i++) // Changed from 20 to 10
 		{
 			if (cachedScores[i].score < lowestHighScore)
 			{
@@ -233,7 +233,7 @@ public class ScoreManager : MonoBehaviour
 			return null;
 		}
 
-		for (int i = 1; i < lines.Length; i++)
+		for (int i = 1; i < lines.Length && i <= 11; i++) // Up to 10 scores + header
 		{
 			string line = lines[i].Trim();
 			if (string.IsNullOrEmpty(line)) continue;
