@@ -11,7 +11,7 @@ public class NameToTitle : MonoBehaviour {
 	{
 		switch(name)
 		{
-		case "Pac-Man":
+		case "Runner":
 			title.color = Color.yellow;
 			break;
 
