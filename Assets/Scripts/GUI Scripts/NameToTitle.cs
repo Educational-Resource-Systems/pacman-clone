@@ -12,7 +12,7 @@ public class NameToTitle : MonoBehaviour {
 		switch(name)
 		{
 		case "Runner":
-			title.color = Color.yellow;
+			title.color = new Color(48f/255f, 185f/255f, 236f/255f);
 			break;
 
 		case "Blanko":
