@@ -7,8 +7,9 @@ public class GameManager : MonoBehaviour {
     //--------------------------------------------------------
     // Game variables
 
-    public static int Level = 0;
-    public static int lives = 3;
+	public static int lives = 3;
+	public static int score = 0;
+	public static int Level = 0;
 
 	public enum GameState { Init, Game, Dead, Scores }
 	public static GameState gameState;
@@ -21,7 +22,7 @@ public class GameManager : MonoBehaviour {
     private GameGUINavigation gui;
 
 	public static bool scared;
-    static public int score;
+    //static public int score;
 
 	public float scareLength;
 	private float _timeToCalm;
@@ -67,7 +68,10 @@ public class GameManager : MonoBehaviour {
 
 	void Start () 
 	{
+		Debug.Log("GameManager Start, initial score: " + score);
 		gameState = GameState.Init;
+		// Ensure initial state is set
+		ResetGame(); // Reset on first load (optional, adjust based on flow)
 	}
 
     void OnLevelWasLoaded()
@@ -180,31 +184,33 @@ public class GameManager : MonoBehaviour {
 
     }
 
-	/*
+
     public void LoseLife()
     {
+		Debug.Log("Losing life, lives: " + lives + ", score: " + score);
         lives--;
         gameState = GameState.Dead;
     
         // update UI too
-        UIScript ui = GameObject.FindObjectOfType<UIScript>();
-        Destroy(ui.lives[ui.lives.Count - 1]);
-        ui.lives.RemoveAt(ui.lives.Count - 1);
+        //UIScript ui = GameObject.FindObjectOfType<UIScript>();
+        //Destroy(ui.lives[ui.lives.Count - 1]);
+        //ui.lives.RemoveAt(ui.lives.Count - 1);
     }
 
-*/
-	public void LoseLife()
+
+	/* public void LoseLife()
 	{
 		Debug.Log("Losing life, lives: " + lives);
 		lives--;
 		gameState = GameState.Dead;
 
-		// update UI too
+
 		UIScript ui = GameObject.FindObjectOfType<UIScript>();
 		Destroy(ui.lives[ui.lives.Count - 1]);
 		ui.lives.RemoveAt(ui.lives.Count - 1);
 
 	}
+	*/
 
     public static void DestroySelf()
     {
@@ -214,4 +220,13 @@ public class GameManager : MonoBehaviour {
         lives = 3;
         Destroy(GameObject.Find("Game Manager"));
     }
+
+	public void ResetGame()
+	{
+		Debug.Log("Resetting game state, score: " + score + " -> 0, lives: " + lives + " -> 3");
+		score = 0;
+		lives = 3;
+		Level = 0;
+		gameState = GameState.Game;
+	}
 }

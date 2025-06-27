@@ -28,6 +28,8 @@ public class GameGUINavigation : MonoBehaviour {
 	// buttons
 	public Button MenuButton;
 
+	private GameManager gameManager;
+
 	//------------------------------------------------------------------
 	// Function Definitions
 
@@ -234,6 +236,7 @@ public class GameGUINavigation : MonoBehaviour {
     public void LoadLevel()
     {
         GameManager.Level++;
+		gameManager.ResetGame();
         Application.LoadLevel("game");
     }
 

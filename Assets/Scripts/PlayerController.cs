@@ -89,6 +89,11 @@ public class PlayerController : MonoBehaviour
 				Debug.LogError("ScoreManager is null, loading game over screen");
 				yield return StartCoroutine(ShowGameOver());
 			}
+			// Reset score after Game Over to prepare for new game
+			if (GM != null)
+			{
+				GM.ResetGame();
+			}
 		}
 		else
 		{
