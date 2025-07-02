@@ -65,6 +65,7 @@ public class GameManager : MonoBehaviour
 		if (gameState != GameState.Dead && gameState != GameState.Scores)
 		{
 			gameState = GameState.Init;
+			if (gui != null) gui.H_ShowReadyScreen();
 		}
 	}
 
@@ -99,10 +100,35 @@ public class GameManager : MonoBehaviour
 
 	public void ResetScene()
 	{
-		Debug.Log("Resetting scene: " + SceneManager.GetActiveScene().name + ", lives: " + lives + ", gameState: " + gameState);
+		Debug.Log("Resetting scene without reload, lives: " + lives + ", gameState: " + gameState);
 		CalmGhosts();
-		gameState = GameState.Dead; // Prevent gameplay during reset
-		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+		gameState = GameState.Dead;
+
+		// Reposition Pacman and ghosts
+		if (pacman != null) pacman.transform.position = new Vector3(15f, 11f, 0f);
+		if (blinky != null) blinky.transform.position = new Vector3(15f, 20f, 0f);
+		if (pinky != null) pinky.transform.position = new Vector3(14.5f, 17f, 0f);
+		if (inky != null) inky.transform.position = new Vector3(16.5f, 17f, 0f);
+		if (clyde != null) clyde.transform.position = new Vector3(12.5f, 17f, 0f);
+
+		// Reset states
+		if (pacman != null) pacman.GetComponent<PlayerController>().ResetDestination();
+		if (blinky != null) blinky.GetComponent<GhostMove>().InitializeGhost();
+		if (pinky != null) pinky.GetComponent<GhostMove>().InitializeGhost();
+		if (inky != null) inky.GetComponent<GhostMove>().InitializeGhost();
+		if (clyde != null) clyde.GetComponent<GhostMove>().InitializeGhost();
+
+		if (gui != null)
+		{
+			gui.H_ShowReadyScreen();
+		}
+		else
+		{
+			Debug.LogWarning("GUI handle is NULL, cannot show Ready screen");
+		}
+
+		gameState = GameState.Init;
+		Debug.Log("Scene reset complete, gameState: " + gameState);
 	}
 
 	public void ToggleScare()
@@ -181,6 +207,30 @@ public class GameManager : MonoBehaviour
 		Level = 0;
 		gameState = GameState.Init;
 		CalmGhosts();
+
+		// Reset dots (assumes TileManager or similar script)
+		TileManager tileManager = FindObjectOfType<TileManager>();
+		if (tileManager != null)
+		{
+			foreach (TileManager.Tile tile in tileManager.tiles)
+			{
+				tile.hasPellet = true; // Reset dot state
+				// If dots are GameObjects, enable them here
+			}
+			Debug.Log("Dots reset via TileManager");
+		}
+		else
+		{
+			Debug.LogWarning("TileManager not found, cannot reset dots");
+			// Alternative: Find GameObjects with "pellet" tag
+			GameObject[] pellets = GameObject.FindGameObjectsWithTag("pellet");
+			foreach (GameObject pellet in pellets)
+			{
+				pellet.SetActive(true);
+			}
+			Debug.Log("Dots reset via GameObjects with 'pellet' tag");
+		}
+
 		if (gui != null) gui.H_ShowReadyScreen();
 	}
 }
