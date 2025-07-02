@@ -183,6 +183,18 @@ public class GameManager : MonoBehaviour
 		Debug.Log("Losing life, lives: " + lives + ", score: " + score + ", gameState: " + gameState);
 		lives--;
 		gameState = GameState.Dead;
+
+		// Update UI life indicator
+		UIScript ui = GameObject.FindObjectOfType<UIScript>();
+		if (ui != null)
+		{
+			ui.UpdateLivesDisplay();
+			Debug.Log("Called UIScript.UpdateLivesDisplay for lives: " + lives);
+		}
+		else
+		{
+			Debug.LogWarning("UIScript not found, cannot update life indicator");
+		}
 	}
 
 	public static void DestroySelf()
@@ -208,29 +220,37 @@ public class GameManager : MonoBehaviour
 		gameState = GameState.Init;
 		CalmGhosts();
 
-		// Reset dots (assumes TileManager or similar script)
-		TileManager tileManager = FindObjectOfType<TileManager>();
-		if (tileManager != null)
+		// Reset dots using GameObjects tagged "pellet"
+		GameObject[] pellets = GameObject.FindGameObjectsWithTag("pellet");
+		foreach (GameObject pellet in pellets)
 		{
-			foreach (TileManager.Tile tile in tileManager.tiles)
+			if (pellet != null)
 			{
-				tile.hasPellet = true; // Reset dot state
-				// If dots are GameObjects, enable them here
+				pellet.SetActive(true);
+				Debug.Log("Reactivating pellet at (" + pellet.transform.position.x + ", " + pellet.transform.position.y + ")");
 			}
-			Debug.Log("Dots reset via TileManager");
+		}
+		Debug.Log("Dots reset: " + pellets.Length + " pellets reactivated");
+
+		// Reset life indicator
+		UIScript ui = GameObject.FindObjectOfType<UIScript>();
+		if (ui != null)
+		{
+			ui.UpdateLivesDisplay();
+			Debug.Log("Called UIScript.UpdateLivesDisplay for reset lives: " + lives);
 		}
 		else
 		{
-			Debug.LogWarning("TileManager not found, cannot reset dots");
-			// Alternative: Find GameObjects with "pellet" tag
-			GameObject[] pellets = GameObject.FindGameObjectsWithTag("pellet");
-			foreach (GameObject pellet in pellets)
-			{
-				pellet.SetActive(true);
-			}
-			Debug.Log("Dots reset via GameObjects with 'pellet' tag");
+			Debug.LogWarning("UIScript not found, cannot reset life indicator");
 		}
 
-		if (gui != null) gui.H_ShowReadyScreen();
+		if (gui != null)
+		{
+			gui.H_ShowReadyScreen();
+		}
+		else
+		{
+			Debug.LogWarning("GUI handle is NULL, cannot show Ready screen");
+		}
 	}
 }
